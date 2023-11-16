@@ -7,14 +7,16 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class PostCreate {
+public class PostSearch {
 
-    private String title;
-    private String content;
+    private String title = "";
+    private String content = "";
 
-
-    public PostCreate(String title, String content) {
+    public PostSearch(String title, String content) {
         this.title = title;
         this.content = content;
+    }
+
+    public PostSearch() {
     }
 }
