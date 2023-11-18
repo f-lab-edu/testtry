@@ -10,8 +10,8 @@ public class PostResponse {
     private String content;
 
     @Builder
-    public PostResponse(String title, String context) {
+    public PostResponse(String title, String content) {
         this.title = title;
-        this.content = context;
+        this.content = content;
     }
 }

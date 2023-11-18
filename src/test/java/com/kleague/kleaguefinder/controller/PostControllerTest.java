@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kleague.kleaguefinder.domain.Post;
 import com.kleague.kleaguefinder.repository.PostRepository;
 import com.kleague.kleaguefinder.request.PostCreate;
+import com.kleague.kleaguefinder.request.PostSearch;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -118,6 +119,114 @@ class PostControllerTest {
                 .andExpect(status().isOk())
                 .andDo(print());
     }
+
+    @Test
+    @DisplayName("글 검색 제목만 ")
+    public void testV6() throws Exception {
+        // given
+        for (int i = 0; i < 3; i++) {
+            Post post = Post.builder()
+                    .title("제목 : " + i )
+                    .content("내용 : " + i)
+                    .build();
+
+            postRepository.save(post);
+        }
+
+        Post anotherPost = Post.builder()
+                .title("특이한 제목")
+                .content("특이한 내용")
+                .build();
+
+        postRepository.save(anotherPost);
+
+        // when
+        PostSearch postSearch = PostSearch.builder().title("특이").build();
+        String json = objectMapper.writeValueAsString(postSearch);
+
+        // then
+        mockMvc.perform(post("/post/search")
+                        .content(json)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].title").value("특이한 제목"))
+                .andExpect(jsonPath("$[0].content").value("특이한 내용"))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("글 검색 내용만 ")
+    public void testV7() throws Exception {
+        // given
+        for (int i = 0; i < 3; i++) {
+            Post post = Post.builder()
+                    .title("제목 : " + i )
+                    .content("내용 : " + i)
+                    .build();
+
+            postRepository.save(post);
+        }
+
+        Post anotherPost = Post.builder()
+                .title("특이한 제목")
+                .content("특이한 내용")
+                .build();
+
+        postRepository.save(anotherPost);
+
+        // when
+        PostSearch postSearch = PostSearch.builder()
+                .content("특이")
+                .build();
+        String json = objectMapper.writeValueAsString(postSearch);
+
+        // then
+        mockMvc.perform(post("/post/search")
+                        .content(json)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].title").value("특이한 제목"))
+                .andExpect(jsonPath("$[0].content").value("특이한 내용"))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("글 검색 조건 없음 : 전체 검색  ")
+    public void testV8() throws Exception {
+        // given
+        for (int i = 0; i < 3; i++) {
+            Post post = Post.builder()
+                    .title("제목 : " + i )
+                    .content("내용 : " + i)
+                    .build();
+
+            postRepository.save(post);
+        }
+
+        Post anotherPost = Post.builder()
+                .title("특이한 제목")
+                .content("특이한 내용")
+                .build();
+
+        postRepository.save(anotherPost);
+
+        // when
+        PostSearch postSearch = PostSearch.builder().build();
+        String json = objectMapper.writeValueAsString(postSearch);
+
+        // then
+        mockMvc.perform(post("/post/search")
+                        .content(json)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].title").value("제목 : 0"))
+                .andExpect(jsonPath("$[0].content").value("내용 : 0"))
+                .andExpect(jsonPath("$[3].title").value("특이한 제목"))
+                .andExpect(jsonPath("[3].content").value("특이한 내용"))
+                .andDo(print());
+    }
+
+
 
 
 }

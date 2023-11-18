@@ -50,15 +50,17 @@ public class PostService {
     }
 
     public List<PostResponse> findBySearch(PostSearch postSearch) {
-        return postRepository.findByTitleContainingAndContentContaining(
-                postSearch.getTitle(), postSearch.getContent())
-                .stream().map(PostService::getPostResponse).collect(Collectors.toList());
+        return postRepository.getList(postSearch).stream()
+                .map(post -> PostResponse.builder()
+                        .title(post.getTitle())
+                        .content(post.getContent())
+                        .build()).collect(Collectors.toList());
     }
 
     private static PostResponse getPostResponse(Post post) {
         return PostResponse.builder()
                 .title(post.getTitle())
-                .context(post.getContent())
+                .content(post.getContent())
                 .build();
     }
 }
