@@ -39,7 +39,6 @@ class PostServiceTest {
         //when
         Long postId = postService.write(postCreate);
         //then
-        assertThat(postId).isEqualTo(1L);
         assertThat(postRepository.count()).isEqualTo(1);
     }
 

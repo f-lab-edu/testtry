@@ -17,6 +17,9 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.StatusResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -219,11 +222,182 @@ class PostControllerTest {
                         .content(json)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].title").value("제목 : 0"))
-                .andExpect(jsonPath("$[0].content").value("내용 : 0"))
-                .andExpect(jsonPath("$[3].title").value("특이한 제목"))
-                .andExpect(jsonPath("[3].content").value("특이한 내용"))
+                .andExpect(jsonPath("$[3].title").value("제목 : 0"))
+                .andExpect(jsonPath("$[3].content").value("내용 : 0"))
+                .andExpect(jsonPath("$[0].title").value("특이한 제목"))
+                .andExpect(jsonPath("[0].content").value("특이한 내용"))
                 .andDo(print());
+    }
+
+    @Test
+    @DisplayName("글 검색 : Default 값 , 페이징 포함")
+    public void testV9 () throws Exception {
+        // given
+        List<Post> posts = new ArrayList<>();
+        for (int i = 0; i < 20; i++) {
+            posts.add(Post.builder()
+                    .title("제목 : " + i )
+                    .content("내용 : " + i)
+                    .build());
+        }
+        postRepository.saveAll(posts);
+
+        for (int i = 0; i < 15; i++) {
+            Post post = Post.builder()
+                    .title("제목 : " + i)
+                    .content("특이한 내용")
+                    .build();
+            postRepository.save(post);
+        }
+
+        // when
+        PostSearch postSearch = PostSearch.builder()
+                .build();
+
+        String json = objectMapper.writeValueAsString(postSearch);
+
+        mockMvc.perform(post("/post/search")
+                        .content(json)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].title").value("제목 : 14"))
+                .andExpect(jsonPath("$[0].content").value("특이한 내용"))
+                .andExpect(jsonPath("$[9].title").value("제목 : 5"))
+                .andExpect(jsonPath("[9].content").value("특이한 내용"))
+                .andDo(print());
+
+    }
+
+
+    @Test
+    @DisplayName("글 검색 : 제목 값 , 페이징 포함")
+    public void testV10 () throws Exception {
+        // given
+        List<Post> posts = new ArrayList<>();
+        for (int i = 0; i < 20; i++) {
+            posts.add(Post.builder()
+                    .title("제목 : " + i )
+                    .content("내용 : " + i)
+                    .build());
+        }
+        postRepository.saveAll(posts);
+
+        for (int i = 0; i < 15; i++) {
+            Post post = Post.builder()
+                    .title("제목 : " + i)
+                    .content("특이한 내용")
+                    .build();
+            postRepository.save(post);
+        }
+
+        // when
+        PostSearch postSearch = PostSearch
+                .builder()
+                .title("2")
+                .page(0)
+                .build();
+
+        String json = objectMapper.writeValueAsString(postSearch);
+
+        mockMvc.perform(post("/post/search")
+                        .content(json)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].title").value("제목 : 12"))
+                .andExpect(jsonPath("$[0].content").value("특이한 내용"))
+                .andExpect(jsonPath("$[1].title").value("제목 : 2"))
+                .andExpect(jsonPath("$[2].title").value("제목 : 12"))
+                .andExpect(jsonPath("$[2].content").value("내용 : 12"))
+                .andExpect(jsonPath("$[3].title").value("제목 : 2"))
+                .andDo(print());
+
+    }
+
+
+    @Test
+    @DisplayName("글 검색 : 내용 값 , 페이징 포함")
+    public void testV11 () throws Exception {
+        // given
+        List<Post> posts = new ArrayList<>();
+        for (int i = 0; i < 20; i++) {
+            posts.add(Post.builder()
+                    .title("제목 : " + i )
+                    .content("내용 : " + i)
+                    .build());
+        }
+        postRepository.saveAll(posts);
+
+        for (int i = 0; i < 15; i++) {
+            Post post = Post.builder()
+                    .title("제목 : " + i)
+                    .content("특이한 내용")
+                    .build();
+            postRepository.save(post);
+        }
+
+        // when
+        PostSearch postSearch = PostSearch
+                .builder()
+                .content("특이한")
+                .page(1)
+                .build();
+
+        String json = objectMapper.writeValueAsString(postSearch);
+
+        mockMvc.perform(post("/post/search")
+                        .content(json)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].title").value("제목 : 4"))
+                .andExpect(jsonPath("$[0].content").value("특이한 내용"))
+                .andExpect(jsonPath("$[4].title").value("제목 : 0"))
+                .andExpect(jsonPath("$[4].content").value("특이한 내용"))
+                .andDo(print());
+
+    }
+
+
+    @Test
+    @DisplayName("글 검색 : 내용 값 , 페이징 포함")
+    public void testV12 () throws Exception {
+        // given
+        List<Post> posts = new ArrayList<>();
+        for (int i = 0; i < 20; i++) {
+            posts.add(Post.builder()
+                    .title("제목 : " + i )
+                    .content("내용 : " + i)
+                    .build());
+        }
+        postRepository.saveAll(posts);
+
+        for (int i = 0; i < 15; i++) {
+            Post post = Post.builder()
+                    .title("제목 : " + "하하하하 " + i)
+                    .content("특이한 내용")
+                    .build();
+            postRepository.save(post);
+        }
+
+        // when
+        PostSearch postSearch = PostSearch
+                .builder()
+                .title("4")
+                .content("특이한")
+                .page(0)
+                .build();
+
+        String json = objectMapper.writeValueAsString(postSearch);
+
+        mockMvc.perform(post("/post/search")
+                        .content(json)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].title").value("제목 : 하하하하 14"))
+                .andExpect(jsonPath("$[0].content").value("특이한 내용"))
+                .andExpect(jsonPath("$[1].title").value("제목 : 하하하하 4"))
+                .andExpect(jsonPath("$[1].content").value("특이한 내용"))
+                .andDo(print());
+
     }
 
 
