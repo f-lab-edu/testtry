@@ -1,6 +1,7 @@
 package com.kleague.kleaguefinder.controller;
 
 import com.kleague.kleaguefinder.request.PostCreate;
+import com.kleague.kleaguefinder.request.PostModify;
 import com.kleague.kleaguefinder.request.PostSearch;
 import com.kleague.kleaguefinder.response.PostResponse;
 import com.kleague.kleaguefinder.service.PostService;
@@ -34,5 +35,15 @@ public class PostController {
     @PostMapping("post/search")
     public List<PostResponse> search(@RequestBody PostSearch postSearch) {
         return postService.findBySearch(postSearch);
+    }
+
+    @PutMapping("post/modify/{postId}")
+    public void modify(@PathVariable("postId") Long postId, @RequestBody PostModify postModify) {
+        postService.modify(postId, postModify);
+    }
+
+    @DeleteMapping("post/delete/{postId}")
+    public void delete(@PathVariable("postId") Long postId) {
+        postService.delete(postId);
     }
 }

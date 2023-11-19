@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kleague.kleaguefinder.domain.Post;
 import com.kleague.kleaguefinder.repository.PostRepository;
 import com.kleague.kleaguefinder.request.PostCreate;
+import com.kleague.kleaguefinder.request.PostModify;
 import com.kleague.kleaguefinder.request.PostSearch;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -398,6 +399,44 @@ class PostControllerTest {
                 .andExpect(jsonPath("$[1].content").value("특이한 내용"))
                 .andDo(print());
 
+    }
+
+    @Test
+    @DisplayName("글 제목 , 내용 수정")
+    public void testV13() throws Exception {
+        Post post = Post.builder()
+                .title("제목 입니다.")
+                .content("내용 입니다.")
+                .build();
+
+        postRepository.save(post);
+
+        PostModify postModify = new PostModify();
+        postModify.setTitle("수정된 제목입니다.");
+        postModify.setContent("수정된 내용입니다.");
+
+        String json = objectMapper.writeValueAsString(postModify);
+
+        mockMvc.perform(put("/post/modify/{postId}", post.getId())
+                        .content(json)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print());
+
+    }
+    @Test
+    @DisplayName("글 게시글 삭제")
+    public void testV14() throws Exception {
+        Post post = Post.builder()
+                .title("제목 입니다.")
+                .content("내용 입니다.")
+                .build();
+
+        postRepository.save(post);
+
+        mockMvc.perform(delete("/post/delete/{postId}", post.getId()))
+                .andExpect(status().isOk())
+                .andDo(print());
     }
 
 

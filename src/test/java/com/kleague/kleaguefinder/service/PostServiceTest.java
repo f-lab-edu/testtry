@@ -4,6 +4,7 @@ import com.kleague.kleaguefinder.domain.Post;
 import com.kleague.kleaguefinder.exception.NoValueException;
 import com.kleague.kleaguefinder.repository.PostRepository;
 import com.kleague.kleaguefinder.request.PostCreate;
+import com.kleague.kleaguefinder.request.PostModify;
 import com.kleague.kleaguefinder.request.PostSearch;
 import com.kleague.kleaguefinder.response.PostResponse;
 import org.junit.jupiter.api.DisplayName;
@@ -350,8 +351,127 @@ class PostServiceTest {
         assertThat(postResponseList.get(5).getContent()).isEqualTo("내용 : 19");
     }
 
+    @Test
+    @DisplayName("글 제목 및 내용 수정")
+    public void testV14() {
+        // given
+        Post post = Post.builder()
+                .title("제목 입니다.")
+                .content("내용 입니다.")
+                .build();
+
+        postRepository.save(post);
+        // when
+        PostModify postModify = new PostModify();
+        postModify.setTitle("수정된 제목입니다.");
+        postModify.setContent("수정된 내용입니다.");
+
+        postService.modify(post.getId(), postModify);
+        // then
+        assertThat(post.getTitle()).isEqualTo("수정된 제목입니다.");
+        assertThat(post.getContent()).isEqualTo("수정된 내용입니다.");
+
+    }
+
+    @Test
+    @DisplayName("글 제목만 수정")
+    public void testV15() {
+        // given
+        Post post = Post.builder()
+                .title("제목 입니다.")
+                .content("내용 입니다.")
+                .build();
+
+        postRepository.save(post);
+        // when
+        PostModify postModify = new PostModify();
+        postModify.setTitle("수정된 제목입니다.");
+
+        postService.modify(post.getId(), postModify);
+
+        // then
+        assertThat(post.getTitle()).isEqualTo("수정된 제목입니다.");
+        assertThat(post.getContent()).isEqualTo("내용 입니다.");
+
+    }
+
+    @Test
+    @DisplayName("글 없는글 수정 시도")
+    public void testV16() {
+        // given
+        Post post = Post.builder()
+                .title("제목 입니다.")
+                .content("내용 입니다.")
+                .build();
+
+        postRepository.save(post);
+        // when
+        PostModify postModify = new PostModify();
+        postModify.setTitle("수정된 제목입니다.");
+
+        assertThatThrownBy(() -> postService.modify(post.getId() + 1L, postModify))
+                .isInstanceOf(NoValueException.class);
+
+    }
+
+    @Test
+    @DisplayName("글 내용만 수정")
+    public void testV17() {
+        // given
+        Post post = Post.builder()
+                .title("제목 입니다.")
+                .content("내용 입니다.")
+                .build();
+
+        postRepository.save(post);
+        // when
+        PostModify postModify = new PostModify();
+        postModify.setContent("수정된 내용입니다.");
+
+        postService.modify(post.getId(), postModify);
+
+        // then
+        assertThat(post.getTitle()).isEqualTo("제목 입니다.");
+        assertThat(post.getContent()).isEqualTo("수정된 내용입니다.");
+
+    }
+
+    @Test
+    @DisplayName("게시글 삭제")
+    public void test18() {
+        // given
+        Post post = Post.builder()
+                .title("제목 입니다.")
+                .content("내용 입니다.")
+                .build();
+
+        postRepository.save(post);
+
+        assertThat(postRepository.count()).isEqualTo(1);
+
+        // when
+        postService.delete(post.getId());
+
+        // then
+        assertThat(postRepository.count()).isEqualTo(0);
+    }
 
 
+    @Test
+    @DisplayName("없는 글 삭제 시도")
+    public void test19() {
+        // given
+        Post post = Post.builder()
+                .title("제목 입니다.")
+                .content("내용 입니다.")
+                .build();
 
+        postRepository.save(post);
+
+        // expected
+        assertThatThrownBy(() -> postService.delete(post.getId() + 100L))
+                .isInstanceOf(NoValueException.class);
+
+    }
 
 }

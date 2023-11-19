@@ -4,6 +4,8 @@ import com.kleague.kleaguefinder.domain.Post;
 import com.kleague.kleaguefinder.exception.NoValueException;
 import com.kleague.kleaguefinder.repository.PostRepository;
 import com.kleague.kleaguefinder.request.PostCreate;
+import com.kleague.kleaguefinder.request.PostModifier;
+import com.kleague.kleaguefinder.request.PostModify;
 import com.kleague.kleaguefinder.request.PostSearch;
 import com.kleague.kleaguefinder.response.PostResponse;
 import lombok.RequiredArgsConstructor;
@@ -55,6 +57,25 @@ public class PostService {
                         .title(post.getTitle())
                         .content(post.getContent())
                         .build()).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void modify(Long postId, PostModify postModify) {
+        Post post = postRepository.findById(postId).orElseThrow(NoValueException::new);
+
+        PostModifier postModifier = post.modifierBuilder()
+                .title(postModify.getTitle())
+                .content(postModify.getContent())
+                .build();
+
+        post.modify(postModifier);
+
+    }
+
+    @Transactional
+    public void delete(Long postId) {
+        Post post = postRepository.findById(postId).orElseThrow(NoValueException::new);
+        postRepository.delete(post);
     }
 
     private static PostResponse getPostResponse(Post post) {

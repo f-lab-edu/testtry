@@ -1,5 +1,7 @@
 package com.kleague.kleaguefinder.domain;
 
+import com.kleague.kleaguefinder.request.PostModifier;
+import com.kleague.kleaguefinder.request.PostModify;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -28,5 +30,17 @@ public class Post {
         this.title = title;
         this.content = content;
     }
+
+    public PostModifier.PostModifierBuilder modifierBuilder() {
+        return PostModifier.builder()
+                .title(this.title)
+                .content(this.content);
+    }
+
+    public void modify(PostModifier postModifier) {
+        this.title = postModifier.getTitle();
+        this.content = postModifier.getContent();
+    }
+
 
 }
