@@ -1,6 +1,5 @@
-package com.kleague.kleaguefinder.request;
+package com.kleague.kleaguefinder.domain;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 

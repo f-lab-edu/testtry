@@ -1,48 +1,45 @@
 package com.kleague.kleaguefinder.controller;
 
-import com.kleague.kleaguefinder.request.PostCreate;
-import com.kleague.kleaguefinder.request.PostModify;
-import com.kleague.kleaguefinder.request.PostSearch;
+import com.kleague.kleaguefinder.request.PostCreateRequest;
+import com.kleague.kleaguefinder.request.PostModifyRequest;
+import com.kleague.kleaguefinder.request.PostSearchRequest;
 import com.kleague.kleaguefinder.response.PostResponse;
 import com.kleague.kleaguefinder.service.PostService;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class PostController {
 
     private final PostService postService;
 
-    @PostMapping("post/write")
-    public Long write(@RequestBody PostCreate postCreate) {
-        return postService.write(postCreate);
+    @PostMapping("v1/posts/write")
+    public Long write(@RequestBody PostCreateRequest postCreateRequest) {
+        return postService.write(postCreateRequest);
     }
 
-    @GetMapping("post/{postId}")
+    @GetMapping("v1/posts/{postId}")
     public PostResponse findOne(@PathVariable("postId") Long postId) {
         return postService.findOne(postId);
     }
 
-    @GetMapping("post/all")
-    public List<PostResponse> findAll() {
-        return postService.findAll();
+    @PostMapping("v1/posts/search")
+    public List<PostResponse> search(@RequestBody PostSearchRequest postSearchRequest) {
+        return postService.findBySearch(postSearchRequest);
     }
 
-    @PostMapping("post/search")
-    public List<PostResponse> search(@RequestBody PostSearch postSearch) {
-        return postService.findBySearch(postSearch);
+    @PutMapping("v1/posts/{postId}")
+    public void modify(@PathVariable("postId") Long postId,
+                       @RequestBody PostModifyRequest postModifyRequest) {
+        postService.modify(postId, postModifyRequest);
     }
 
-    @PutMapping("post/modify/{postId}")
-    public void modify(@PathVariable("postId") Long postId, @RequestBody PostModify postModify) {
-        postService.modify(postId, postModify);
-    }
-
-    @DeleteMapping("post/delete/{postId}")
+    @DeleteMapping("v1/posts/{postId}")
     public void delete(@PathVariable("postId") Long postId) {
         postService.delete(postId);
     }

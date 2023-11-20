@@ -1,28 +1,29 @@
 package com.kleague.kleaguefinder.domain;
 
-import com.kleague.kleaguefinder.request.PostModifier;
-import com.kleague.kleaguefinder.request.PostModify;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 
 @Entity
 @Getter
+@Table(name = "post")
+@NoArgsConstructor
 public class Post {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "title")
+    @NotEmpty
     private String title;
+
+    @Column(name = "content")
+    @NotEmpty
     private String content;
-
-    public Post() {
-
-    }
 
     @Builder
     public Post(Long id, String title, String content) {

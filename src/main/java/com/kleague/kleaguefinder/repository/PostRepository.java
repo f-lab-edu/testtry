@@ -3,9 +3,7 @@ package com.kleague.kleaguefinder.repository;
 import com.kleague.kleaguefinder.domain.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
-
-public interface PostRepository extends JpaRepository<Post, Long>, CustomRepository{
+public interface PostRepository extends JpaRepository<Post, Long>, PostCustomRepository {
 
 
 }

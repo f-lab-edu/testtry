@@ -1,17 +1,20 @@
 package com.kleague.kleaguefinder.request;
 
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import static java.lang.Math.*;
 
 @Getter
 @Setter
 @Builder
-public class PostSearch {
+@NoArgsConstructor
+public class PostSearchRequest {
 
+    @Autowired
     private static final int MAX_SIZE = 30;
 
     @Builder.Default
@@ -23,7 +26,7 @@ public class PostSearch {
     @Builder.Default
     private int size = 10;
 
-    public PostSearch(String title, String content, int page, int size) {
+    public PostSearchRequest(String title, String content, int page, int size) {
         this.title = title;
         this.content = content;
         this.page = page;

@@ -1,18 +1,20 @@
 package com.kleague.kleaguefinder.request;
 
-import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.NotEmpty;
+
 @Getter
 @Setter
-public class PostCreate {
+public class PostCreateRequest {
 
+    @NotEmpty
     private String title;
+    @NotEmpty
     private String content;
 
-    public PostCreate(String title, String content) {
+    public PostCreateRequest(String title, String content) {
         this.title = title;
         this.content = content;
     }

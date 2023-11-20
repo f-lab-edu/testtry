@@ -1,23 +1,26 @@
 package com.kleague.kleaguefinder.service;
 
 import com.kleague.kleaguefinder.domain.Post;
-import com.kleague.kleaguefinder.exception.NoValueException;
+import com.kleague.kleaguefinder.exception.NoIdValueException;
 import com.kleague.kleaguefinder.repository.PostRepository;
-import com.kleague.kleaguefinder.request.PostCreate;
-import com.kleague.kleaguefinder.request.PostModifier;
-import com.kleague.kleaguefinder.request.PostModify;
-import com.kleague.kleaguefinder.request.PostSearch;
+import com.kleague.kleaguefinder.request.PostCreateRequest;
+import com.kleague.kleaguefinder.domain.PostModifier;
+import com.kleague.kleaguefinder.request.PostModifyRequest;
+import com.kleague.kleaguefinder.request.PostSearchRequest;
 import com.kleague.kleaguefinder.response.PostResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.kleague.kleaguefinder.response.PostResponse.*;
+
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
+@Slf4j
 public class PostService {
     /**
      * 글 추가
@@ -29,10 +32,10 @@ public class PostService {
     private final PostRepository postRepository;
 
     @Transactional
-    public Long write(PostCreate postCreate) {
+    public Long write(PostCreateRequest postCreateRequest) {
         Post post = Post.builder()
-                .title(postCreate.getTitle())
-                .content(postCreate.getContent())
+                .title(postCreateRequest.getTitle())
+                .content(postCreateRequest.getContent())
                 .build();
 
         postRepository.save(post);
@@ -40,32 +43,30 @@ public class PostService {
         return post.getId();
     }
 
+    @Transactional(readOnly = true)
     public PostResponse findOne(Long postId) {
-        Post post = postRepository.findById(postId).orElseThrow(NoValueException::new);
 
-        return getPostResponse(post);
+        Post post = postRepository.findById(postId).orElseThrow(() -> new NoIdValueException(postId, "Post"));
+
+        return createPostResponse(post);
     }
 
-    public List<PostResponse> findAll() {
-        return postRepository.findAll().stream()
-                .map(PostService::getPostResponse).collect(Collectors.toList());
-    }
-
-    public List<PostResponse> findBySearch(PostSearch postSearch) {
-        return postRepository.getList(postSearch).stream()
-                .map(post -> PostResponse.builder()
+    @Transactional(readOnly = true)
+    public List<PostResponse> findBySearch(PostSearchRequest postSearchRequest) {
+        return postRepository.getList(postSearchRequest).stream()
+                .map(post -> builder()
                         .title(post.getTitle())
                         .content(post.getContent())
                         .build()).collect(Collectors.toList());
     }
 
     @Transactional
-    public void modify(Long postId, PostModify postModify) {
-        Post post = postRepository.findById(postId).orElseThrow(NoValueException::new);
+    public void modify(Long postId, PostModifyRequest postModifyRequest) {
+        Post post = postRepository.findById(postId).orElseThrow(() -> new NoIdValueException(postId, "Post"));
 
         PostModifier postModifier = post.modifierBuilder()
-                .title(postModify.getTitle())
-                .content(postModify.getContent())
+                .title(postModifyRequest.getTitle())
+                .content(postModifyRequest.getContent())
                 .build();
 
         post.modify(postModifier);
@@ -74,14 +75,8 @@ public class PostService {
 
     @Transactional
     public void delete(Long postId) {
-        Post post = postRepository.findById(postId).orElseThrow(NoValueException::new);
+        Post post = postRepository.findById(postId).orElseThrow(() -> new NoIdValueException(postId, "Post"));
         postRepository.delete(post);
     }
 
-    private static PostResponse getPostResponse(Post post) {
-        return PostResponse.builder()
-                .title(post.getTitle())
-                .content(post.getContent())
-                .build();
-    }
 }
