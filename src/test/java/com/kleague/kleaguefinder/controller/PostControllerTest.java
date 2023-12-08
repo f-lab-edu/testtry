@@ -39,7 +39,7 @@ class PostControllerTest {
 
     @Test
     @DisplayName("글 작성 성공")
-    public void testV1() throws Exception {
+    public void writePostSuccess() throws Exception {
         //given
         PostCreateRequest postCreate = new PostCreateRequest("제목", "내용");
         //when
@@ -53,7 +53,7 @@ class PostControllerTest {
 
     @Test
     @DisplayName("글 단건 검색 - 성공")
-    public void testV2() throws Exception {
+    public void searchPostSuccess() throws Exception {
         //given
         Post post = Post.builder()
                 .title("제목")
@@ -73,7 +73,7 @@ class PostControllerTest {
 
     @Test
     @DisplayName("글 단건 검색 - 없는 글 검색")
-    public void testV3() throws Exception {
+    public void searchPostNoPost() throws Exception {
         //given
         Post post = Post.builder()
                 .title("제목")
@@ -89,7 +89,7 @@ class PostControllerTest {
 
     @Test
     @DisplayName("글 검색 제목만 ")
-    public void testV4() throws Exception {
+    public void searchPostByTitle() throws Exception {
         // given
         for (int i = 0; i < 3; i++) {
             Post post = Post.builder()
@@ -123,7 +123,7 @@ class PostControllerTest {
 
     @Test
     @DisplayName("글 검색 내용만 ")
-    public void testV5() throws Exception {
+    public void searchPostByContent() throws Exception {
         // given
         for (int i = 0; i < 3; i++) {
             Post post = Post.builder()
@@ -159,7 +159,7 @@ class PostControllerTest {
 
     @Test
     @DisplayName("글 검색 조건 없음 : 전체 검색  ")
-    public void testV6() throws Exception {
+    public void searchPostV1() throws Exception {
         // given
         for (int i = 0; i < 3; i++) {
             Post post = Post.builder()
@@ -195,7 +195,7 @@ class PostControllerTest {
 
     @Test
     @DisplayName("글 검색 : Default 값 , 페이징 포함")
-    public void testV7 () throws Exception {
+    public void searchPostV2 () throws Exception {
         // given
         List<Post> posts = new ArrayList<>();
         for (int i = 0; i < 20; i++) {
@@ -235,7 +235,7 @@ class PostControllerTest {
 
     @Test
     @DisplayName("글 검색 : 제목 값 , 페이징 포함")
-    public void testV8 () throws Exception {
+    public void searchPostV3 () throws Exception {
         // given
         List<Post> posts = new ArrayList<>();
         for (int i = 0; i < 20; i++) {
@@ -280,7 +280,7 @@ class PostControllerTest {
 
     @Test
     @DisplayName("글 검색 : 내용 값 , 페이징 포함")
-    public void testV9 () throws Exception {
+    public void searchPostV4 () throws Exception {
         // given
         List<Post> posts = new ArrayList<>();
         for (int i = 0; i < 20; i++) {
@@ -323,7 +323,7 @@ class PostControllerTest {
 
     @Test
     @DisplayName("글 검색 : 내용 값 , 페이징 포함")
-    public void testV10 () throws Exception {
+    public void searchPostV5() throws Exception {
         // given
         List<Post> posts = new ArrayList<>();
         for (int i = 0; i < 20; i++) {
@@ -366,7 +366,7 @@ class PostControllerTest {
 
     @Test
     @DisplayName("글 제목 , 내용 수정")
-    public void testV11() throws Exception {
+    public void modifyPost() throws Exception {
         Post post = Post.builder()
                 .title("제목 입니다.")
                 .content("내용 입니다.")
@@ -389,7 +389,7 @@ class PostControllerTest {
     }
     @Test
     @DisplayName("글 게시글 삭제")
-    public void testV12() throws Exception {
+    public void deletePost() throws Exception {
         Post post = Post.builder()
                 .title("제목 입니다.")
                 .content("내용 입니다.")
@@ -404,7 +404,7 @@ class PostControllerTest {
 
     @Test
     @DisplayName("없는 글 게시글 삭제")
-    public void testV13() throws Exception {
+    public void deletePostNoPost() throws Exception {
         Post post = Post.builder()
                 .title("제목 입니다.")
                 .content("내용 입니다.")
@@ -419,7 +419,7 @@ class PostControllerTest {
 
     @Test
     @DisplayName("없는 글 조회")
-    public void testV14() throws Exception {
+    public void searchNoPost() throws Exception {
         Post post = Post.builder()
                 .title("제목 입니다.")
                 .content("내용 입니다.")

@@ -53,7 +53,7 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public List<PostResponse> findBySearch(PostSearchRequest postSearchRequest) {
-        return postRepository.getList(postSearchRequest).stream()
+        return postRepository.findBySearchRequest(postSearchRequest).stream()
                 .map(post -> builder()
                         .title(post.getTitle())
                         .content(post.getContent())

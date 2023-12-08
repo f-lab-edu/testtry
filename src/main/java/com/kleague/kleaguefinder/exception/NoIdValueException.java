@@ -1,6 +1,7 @@
 package com.kleague.kleaguefinder.exception;
 
 import org.jboss.jandex.Main;
+import org.springframework.http.HttpStatus;
 
 public class NoIdValueException extends MainException {
 

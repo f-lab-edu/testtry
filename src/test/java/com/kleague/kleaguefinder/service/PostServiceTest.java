@@ -33,7 +33,7 @@ class PostServiceTest {
 
     @Test
     @DisplayName("글 작성 성공")
-    public void testV1() {
+    public void writeSuccess() {
         //given
         PostCreateRequest postCreate = new PostCreateRequest("제목", "내용");
         //when
@@ -44,7 +44,7 @@ class PostServiceTest {
 
     @Test
     @DisplayName("글 단건 검색 - 성공")
-    public void testV2() {
+    public void findPostOneSuccess() {
         // given
         Post post = Post.builder()
                 .title("제목")
@@ -63,7 +63,7 @@ class PostServiceTest {
 
     @Test
     @DisplayName("글 단건 검색 - 없는 글 검색")
-    public void testV3() {
+    public void findPostOneNoValue() {
         // given
         Post post = Post.builder()
                 .title("제목")
@@ -79,7 +79,7 @@ class PostServiceTest {
 
     @Test
     @DisplayName("글 전체 검색 - 페이징 X")
-    public void testV4() {
+    public void findPostAll() {
         // given
         for (int i = 0; i < 5; i++) {
             Post post = Post.builder()
@@ -101,7 +101,7 @@ class PostServiceTest {
 
     @Test
     @DisplayName("글 전체 검색 - 글 미등록")
-    public void testV5() {
+    public void findPostAllNoPost() {
 
         // when
         List<PostResponse> postResponseList = postService.findBySearch(new PostSearchRequest());
@@ -113,7 +113,7 @@ class PostServiceTest {
 
     @Test
     @DisplayName("글 검색 - 제목만")
-    public void testV6() {
+    public void searchPostByTitle() {
         // given
         for (int i = 0; i < 5; i++) {
             Post post = Post.builder()
@@ -137,7 +137,7 @@ class PostServiceTest {
 
     @Test
     @DisplayName("글 검색 - 내용만")
-    public void testV7() {
+    public void searchPostByContent() {
         // given
         for (int i = 0; i < 5; i++) {
             Post post = Post.builder()
@@ -168,7 +168,7 @@ class PostServiceTest {
 
     @Test
     @DisplayName("글 검색 : 검색 입력 안함")
-    public void testV8() {
+    public void searchPostNoSearchValue() {
         // given
         for (int i = 0; i < 20; i++) {
             Post post = Post.builder()
@@ -193,7 +193,7 @@ class PostServiceTest {
 
     @Test
     @DisplayName("글 검색 : 제목 - 페이징 확인 ( Default )")
-    public void testV9() {
+    public void searchPostPagingV1() {
         // given
 
         List<Post> posts = new ArrayList<>();
@@ -222,7 +222,7 @@ class PostServiceTest {
 
     @Test
     @DisplayName("글 검색 : 제목 - 페이징 확인 ( Page  )")
-    public void testV10() {
+    public void searchPostPagingV2() {
         // given
 
         List<Post> posts = new ArrayList<>();
@@ -251,7 +251,7 @@ class PostServiceTest {
 
     @Test
     @DisplayName("글 검색 : 제목 - 페이징 확인 ( Page 설정을 초과 )")
-    public void testV11() {
+    public void searchPostPagingV3() {
         // given
         List<Post> posts = new ArrayList<>();
         for (int i = 0; i < 20; i++) {
@@ -279,7 +279,7 @@ class PostServiceTest {
 
     @Test
     @DisplayName("글 검색 : 내용 - 페이징 확인 ( Page  )")
-    public void testV12() {
+    public void searchPostPagingV4() {
         // given
 
         List<Post> posts = new ArrayList<>();
@@ -316,7 +316,7 @@ class PostServiceTest {
 
     @Test
     @DisplayName("글 검색 : 조건은 없고 페이징만 적용")
-    public void testV13() {
+    public void searchPostPagingV5() {
         // given
 
         List<Post> posts = new ArrayList<>();
@@ -352,7 +352,7 @@ class PostServiceTest {
 
     @Test
     @DisplayName("글 제목 및 내용 수정")
-    public void testV14() {
+    public void modifyPost() {
         // given
         Post post = Post.builder()
                 .title("제목 입니다.")
@@ -374,7 +374,7 @@ class PostServiceTest {
 
     @Test
     @DisplayName("글 제목만 수정")
-    public void testV15() {
+    public void modifyPostTitle() {
         // given
         Post post = Post.builder()
                 .title("제목 입니다.")
@@ -396,7 +396,7 @@ class PostServiceTest {
 
     @Test
     @DisplayName("글 없는글 수정 시도")
-    public void testV16() {
+    public void modifyNoPost() {
         // given
         Post post = Post.builder()
                 .title("제목 입니다.")
@@ -415,7 +415,7 @@ class PostServiceTest {
 
     @Test
     @DisplayName("글 내용만 수정")
-    public void testV17() {
+    public void modifyPostContent() {
         // given
         Post post = Post.builder()
                 .title("제목 입니다.")
@@ -437,7 +437,7 @@ class PostServiceTest {
 
     @Test
     @DisplayName("게시글 삭제")
-    public void test18() {
+    public void deletePost() {
         // given
         Post post = Post.builder()
                 .title("제목 입니다.")
@@ -458,7 +458,7 @@ class PostServiceTest {
 
     @Test
     @DisplayName("없는 글 삭제 시도")
-    public void test19() {
+    public void DeleteNoPost() {
         // given
         Post post = Post.builder()
                 .title("제목 입니다.")
