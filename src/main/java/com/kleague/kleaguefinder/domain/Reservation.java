@@ -1,11 +1,12 @@
 package com.kleague.kleaguefinder.domain;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -20,24 +21,17 @@ public class Reservation {
 
     private String name;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "seat_id")
-    private Seat seat;
+    @OneToMany(mappedBy = "reservation")
+    private List<ReservedSeat> reservedSeatList = new ArrayList<>();
 
-    private LocalDateTime localDateTime;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "gameInfo_id")
+    private GameInfo gameInfo;
+
+    private LocalDateTime reservedTime;
 
     private ReservationStatus reservationStatus;
 
-    @Builder
-    public Reservation(String name, Seat seat, LocalDateTime localDateTime, ReservationStatus reservationStatus) {
-        this.name = name;
-        this.seat = seat;
-        this.localDateTime = localDateTime;
-        this.reservationStatus = reservationStatus;
-    }
 
-    public void changeSeat(Seat seat) {
-        this.seat = seat;
-        seat.changeReservation(this);
-    }
+
 }

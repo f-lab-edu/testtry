@@ -25,13 +25,11 @@ public class GameInfo {
 
     private String location;
 
-    @OneToMany(mappedBy = "gameInfo", cascade = CascadeType.ALL)
-    private List<Seat> seatList = new ArrayList<>();
-
     @Builder
     public GameInfo(String name, String date, String location) {
         this.name = name;
         this.date = date;
         this.location = location;
     }
+
 }
