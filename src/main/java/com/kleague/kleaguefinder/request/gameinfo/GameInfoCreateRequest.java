@@ -1,11 +1,11 @@
-package com.kleague.kleaguefinder.request;
+package com.kleague.kleaguefinder.request.gameinfo;
 
 import com.kleague.kleaguefinder.domain.GameInfo;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class GameInfoRequest {
+public class GameInfoCreateRequest {
 
     private String name;
 
@@ -14,7 +14,7 @@ public class GameInfoRequest {
     private String location;
 
     @Builder
-    public GameInfoRequest(String name, String date, String location) {
+    public GameInfoCreateRequest(String name, String date, String location) {
         this.name = name;
         this.date = date;
         this.location = location;

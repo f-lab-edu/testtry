@@ -32,4 +32,11 @@ public class GameInfo {
         this.location = location;
     }
 
+    // 매번 null 을 체크하는 건 중복 및 유지보수에서 어려움이 있다.
+    public void modify(String name, String date, String location) {
+        this.name = (name == null ? this.name : name);
+        this.date = (date == null ? this.date : date);
+        this.location = (location == null ? this.location : location);
+    }
+
 }

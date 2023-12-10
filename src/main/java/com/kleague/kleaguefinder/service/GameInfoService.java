@@ -1,8 +1,10 @@
 package com.kleague.kleaguefinder.service;
 
 import com.kleague.kleaguefinder.domain.GameInfo;
-import com.kleague.kleaguefinder.repository.GameInfoRepository;
-import com.kleague.kleaguefinder.request.GameInfoRequest;
+import com.kleague.kleaguefinder.repository.gameinfo.GameInfoRepository;
+import com.kleague.kleaguefinder.request.gameinfo.GameInfoCreateRequest;
+import com.kleague.kleaguefinder.request.gameinfo.GameInfoModifyRequest;
+import com.kleague.kleaguefinder.request.gameinfo.GameInfoSearchRequest;
 import com.kleague.kleaguefinder.response.GameInfoResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,7 +24,7 @@ public class GameInfoService {
     }
 
     @Transactional
-    public Long save(GameInfoRequest requestDto) {
+    public Long save(GameInfoCreateRequest requestDto) {
 
         GameInfo entity = requestDto.toEntity();
         gameInfoRepository.save(entity);
@@ -37,14 +39,20 @@ public class GameInfoService {
     }
 
     @Transactional(readOnly = true)
-    public List<GameInfoResponse> findAll() {
-        return gameInfoRepository.findAll().stream()
-                .map(GameInfoResponse::createGameInfoResponse).collect(Collectors.toList());
+    public List<GameInfoResponse> findByRequest(GameInfoSearchRequest request) {
+        return gameInfoRepository.findByRequest(request)
+                .stream().map(GameInfoResponse::createGameInfoResponse).collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true)
-    public List<GameInfoResponse> searchByDate(String date) {
-        return gameInfoRepository.findByDate(date).stream()
-                .map(GameInfoResponse::createGameInfoResponse).collect(Collectors.toList());
+    @Transactional
+    public void modify(Long gameInfoId, GameInfoModifyRequest request) {
+        GameInfo gameInfo = gameInfoRepository.findById(gameInfoId).orElseThrow(IllegalStateException::new);
+        gameInfo.modify(request.getName(), request.getDate(), request.getLocation());
+    }
+
+    @Transactional
+    public void delete(Long gameInfoId) {
+        GameInfo gameInfo = gameInfoRepository.findById(gameInfoId).orElseThrow(IllegalStateException::new);
+        gameInfoRepository.delete(gameInfo);
     }
 }
