@@ -12,11 +12,12 @@ public class GameInfoSearchRequest {
 
     private static final int MAX_SIZE = 30;
 
-    private String name;
-
-    private String date;
-
-    private String location;
+    @Builder.Default
+    private String name = "";
+    @Builder.Default
+    private String date = "";
+    @Builder.Default
+    private String location = "";
 
     @Builder.Default
     private int page = 0;

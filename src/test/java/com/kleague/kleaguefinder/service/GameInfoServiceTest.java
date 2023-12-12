@@ -55,8 +55,18 @@ class GameInfoServiceTest {
         Long savedId = gameInfoService.save(createRequest1);
 
         // then
-        assertThat(savedId).isEqualTo(1L);
+        assertThat(savedId).isEqualTo(2L);
 
+    }
+
+    @Test
+    @DisplayName("게임 정보 실패")
+    public void saveGameInfoFail() {
+        // given
+        gameInfoRepository.save(createRequest1.toEntity());
+
+        // expected
+        assertThatThrownBy(() -> gameInfoService.save(createRequest1)).isInstanceOf(IllegalStateException.class);
     }
 
     @Test
@@ -103,9 +113,7 @@ class GameInfoServiceTest {
 
         // when
         GameInfoSearchRequest searchRequest = GameInfoSearchRequest.builder()
-                .name("경기 이름")
                 .date("12월 7일")
-                .location("경기 위치")
                 .build();
 
         List<GameInfoResponse> gameInfoResponses = gameInfoService.findByRequest(searchRequest);

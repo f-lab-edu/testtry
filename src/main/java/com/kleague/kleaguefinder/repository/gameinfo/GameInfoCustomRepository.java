@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface GameInfoCustomRepository {
     List<GameInfo> findByRequest(GameInfoSearchRequest request);
+
+    List<GameInfo> findByNameAndDate(String name, String date);
 }

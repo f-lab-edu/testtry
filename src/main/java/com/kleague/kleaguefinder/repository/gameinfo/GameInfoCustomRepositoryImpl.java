@@ -17,10 +17,20 @@ public class GameInfoCustomRepositoryImpl implements GameInfoCustomRepository{
     @Override
     public List<GameInfo> findByRequest(GameInfoSearchRequest request) {
         return jpaQueryFactory.selectFrom(gameInfo)
-                .where(gameInfo.date.contains(request.getDate()))
+                .where(gameInfo.date.contains(request.getDate())
+                        .and(gameInfo.name.contains(request.getName()))
+                        .and(gameInfo.location.contains(request.getLocation())))
                 .limit(request.getSize())
                 .offset(request.getOffset())
                 .orderBy(gameInfo.id.desc())
+                .fetch();
+    }
+
+    @Override
+    public List<GameInfo> findByNameAndDate(String name, String date) {
+        return jpaQueryFactory.selectFrom(gameInfo)
+                .where(gameInfo.name.equalsIgnoreCase(name)
+                        .and(gameInfo.date.equalsIgnoreCase(date)))
                 .fetch();
     }
 }

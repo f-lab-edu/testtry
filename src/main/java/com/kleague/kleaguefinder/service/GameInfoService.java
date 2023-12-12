@@ -26,14 +26,25 @@ public class GameInfoService {
     @Transactional
     public Long save(GameInfoCreateRequest requestDto) {
 
+        validationCheck(requestDto.getName(), requestDto.getDate());
+
         GameInfo entity = requestDto.toEntity();
         gameInfoRepository.save(entity);
         return entity.getId();
 
     }
 
+    private void validationCheck(String name, String date) {
+        List<GameInfo> gameInfoList = gameInfoRepository.findByNameAndDate(name, date);
+
+        if(!gameInfoList.isEmpty()){
+            throw new IllegalStateException("이미 존재하는 경기 정보 입니다.");
+        }
+    }
+
     @Transactional(readOnly = true)
     public GameInfoResponse findById(Long gameInfoId) {
+        log.info("service id ={}", gameInfoId);
         GameInfo gameInfo = gameInfoRepository.findById(gameInfoId).orElseThrow(IllegalStateException::new);
         return GameInfoResponse.createGameInfoResponse(gameInfo);
     }

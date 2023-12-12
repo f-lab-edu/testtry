@@ -21,6 +21,7 @@ public class GameInfoController {
 
     @PostMapping("api/v1/gameInfo/save")
     public Long save(@RequestBody GameInfoCreateRequest request) {
+        log.info("controller request ={}", request.getDate());
         return gameInfoService.save(request);
     }
 
@@ -29,7 +30,7 @@ public class GameInfoController {
         return gameInfoService.findById(id);
     }
 
-    @PostMapping("api/v1/gameInfo/all")
+    @PostMapping("api/v1/gameInfo/search")
     public List<GameInfoResponse> search(@RequestBody GameInfoSearchRequest request) {
         return gameInfoService.findByRequest(request);
     }
