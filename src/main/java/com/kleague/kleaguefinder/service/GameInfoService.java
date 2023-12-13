@@ -1,6 +1,8 @@
 package com.kleague.kleaguefinder.service;
 
 import com.kleague.kleaguefinder.domain.GameInfo;
+import com.kleague.kleaguefinder.exception.DuplicatedValueException;
+import com.kleague.kleaguefinder.exception.NoValueException;
 import com.kleague.kleaguefinder.repository.gameinfo.GameInfoRepository;
 import com.kleague.kleaguefinder.request.gameinfo.GameInfoCreateRequest;
 import com.kleague.kleaguefinder.request.gameinfo.GameInfoModifyRequest;
@@ -38,14 +40,14 @@ public class GameInfoService {
         List<GameInfo> gameInfoList = gameInfoRepository.findByNameAndDate(name, date);
 
         if(!gameInfoList.isEmpty()){
-            throw new IllegalStateException("이미 존재하는 경기 정보 입니다.");
+            throw new DuplicatedValueException("GameInfo", "name & date");
         }
     }
 
     @Transactional(readOnly = true)
     public GameInfoResponse findById(Long gameInfoId) {
-        log.info("service id ={}", gameInfoId);
-        GameInfo gameInfo = gameInfoRepository.findById(gameInfoId).orElseThrow(IllegalStateException::new);
+        GameInfo gameInfo = gameInfoRepository.findById(gameInfoId)
+                .orElseThrow(() -> new NoValueException("GameInfo", "id"));
         return GameInfoResponse.createGameInfoResponse(gameInfo);
     }
 
@@ -57,13 +59,15 @@ public class GameInfoService {
 
     @Transactional
     public void modify(Long gameInfoId, GameInfoModifyRequest request) {
-        GameInfo gameInfo = gameInfoRepository.findById(gameInfoId).orElseThrow(IllegalStateException::new);
+        GameInfo gameInfo = gameInfoRepository.findById(gameInfoId)
+                .orElseThrow(() -> new NoValueException("GameInfo", "id"));
         gameInfo.modify(request.getName(), request.getDate(), request.getLocation());
     }
 
     @Transactional
     public void delete(Long gameInfoId) {
-        GameInfo gameInfo = gameInfoRepository.findById(gameInfoId).orElseThrow(IllegalStateException::new);
+        GameInfo gameInfo = gameInfoRepository.findById(gameInfoId)
+                .orElseThrow(() -> new NoValueException("GameInfo", "id"));
         gameInfoRepository.delete(gameInfo);
     }
 }

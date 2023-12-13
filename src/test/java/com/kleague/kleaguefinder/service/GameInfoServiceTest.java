@@ -1,6 +1,8 @@
 package com.kleague.kleaguefinder.service;
 
 import com.kleague.kleaguefinder.domain.GameInfo;
+import com.kleague.kleaguefinder.exception.DuplicatedValueException;
+import com.kleague.kleaguefinder.exception.NoValueException;
 import com.kleague.kleaguefinder.repository.gameinfo.GameInfoRepository;
 import com.kleague.kleaguefinder.request.gameinfo.GameInfoCreateRequest;
 import com.kleague.kleaguefinder.request.gameinfo.GameInfoModifyRequest;
@@ -66,7 +68,8 @@ class GameInfoServiceTest {
         gameInfoRepository.save(createRequest1.toEntity());
 
         // expected
-        assertThatThrownBy(() -> gameInfoService.save(createRequest1)).isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(() -> gameInfoService.save(createRequest1))
+                .isInstanceOf(DuplicatedValueException.class);
     }
 
     @Test
@@ -101,6 +104,23 @@ class GameInfoServiceTest {
         assertThat(response.getDate()).isEqualTo(createRequest1.getDate());
         assertThat(response.getName()).isEqualTo(createRequest1.getName());
         assertThat(response.getLocation()).isEqualTo(createRequest1.getLocation());
+    }
+
+
+    @Test
+    @DisplayName("Id로 GameInfo 찾기 - 예외 발생")
+    public void findByGameInfoIdFail() {
+
+        // given
+        Long id1 = gameInfoService.save(createRequest1);
+        gameInfoService.save(createRequest2);
+
+
+        // when
+        assertThatThrownBy(() -> gameInfoService.findById(id1 + 20L))
+                .isInstanceOf(NoValueException.class);
+
+
     }
 
     @Test
@@ -182,6 +202,8 @@ class GameInfoServiceTest {
         GameInfo gameInfo = gameInfoRepository.save(createRequest1.toEntity());
         GameInfoModifyRequest request = GameInfoModifyRequest.builder()
                 .name("부산 vs 청주")
+                .date("12월 7일")
+                .location("부산 아시아드")
                 .build();
 
         // when
@@ -200,11 +222,13 @@ class GameInfoServiceTest {
         GameInfo gameInfo = gameInfoRepository.save(createRequest1.toEntity());
         GameInfoModifyRequest request = GameInfoModifyRequest.builder()
                 .name("부산 vs 청주")
+                .date("12월 7일")
+                .location("부산 아시아드")
                 .build();
 
         // expected
         assertThatThrownBy(() -> gameInfoService.modify(gameInfo.getId() + 1L, request))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(NoValueException.class);
 
     }
 
@@ -229,7 +253,7 @@ class GameInfoServiceTest {
 
         // expected
         assertThatThrownBy(() -> gameInfoService.delete(gameInfo.getId() + 1L))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(NoValueException.class);
 
         assertThat(gameInfoRepository.count()).isEqualTo(1);
 

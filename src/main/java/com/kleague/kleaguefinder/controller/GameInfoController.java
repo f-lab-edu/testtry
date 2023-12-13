@@ -25,8 +25,8 @@ public class GameInfoController {
         return gameInfoService.save(request);
     }
 
-    @GetMapping("api/v1/gameInfo/{Id}")
-    public GameInfoResponse findOne(@PathVariable("Id") Long id) {
+    @GetMapping("api/v1/gameInfo/{gameInfoId}")
+    public GameInfoResponse findOne(@PathVariable("gameInfoId") Long id) {
         return gameInfoService.findById(id);
     }
 
@@ -35,13 +35,13 @@ public class GameInfoController {
         return gameInfoService.findByRequest(request);
     }
 
-    @PutMapping("api/v1/gameInfo/{Id}")
-    public void modify(@PathVariable("Id") Long id, @RequestBody GameInfoModifyRequest request) {
+    @PutMapping("api/v1/gameInfo/{gameInfoId}")
+    public void modify(@PathVariable("gameInfoId") Long id, @RequestBody GameInfoModifyRequest request) {
         gameInfoService.modify(id,request);
     }
 
-    @DeleteMapping("api/v1/gameInfo/{id}")
-    public void delete(@PathVariable("Id") Long id) {
+    @DeleteMapping("api/v1/gameInfo/{gameInfoId}")
+    public void delete(@PathVariable("gameInfoId") Long id) {
         gameInfoService.delete(id);
     }
 

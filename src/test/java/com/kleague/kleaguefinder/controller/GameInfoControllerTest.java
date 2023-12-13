@@ -1,10 +1,10 @@
 package com.kleague.kleaguefinder.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kleague.kleaguefinder.domain.GameInfo;
 import com.kleague.kleaguefinder.repository.gameinfo.GameInfoRepository;
 import com.kleague.kleaguefinder.request.gameinfo.GameInfoCreateRequest;
+import com.kleague.kleaguefinder.request.gameinfo.GameInfoModifyRequest;
 import com.kleague.kleaguefinder.request.gameinfo.GameInfoSearchRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,15 +12,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static com.kleague.kleaguefinder.exception.ErrorCode.*;
+import static org.springframework.http.MediaType.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -41,7 +41,6 @@ public class GameInfoControllerTest {
 
     GameInfo gameInfo;
 
-    GameInfoSearchRequest searchRequest;
 
     @BeforeEach
     public void setUp() {
@@ -71,9 +70,6 @@ public class GameInfoControllerTest {
 
         gameInfoRepository.save(gameInfo);
 
-        searchRequest = GameInfoSearchRequest.builder()
-                .name("경기 이름")
-                .build();
     }
 
     @Test
@@ -88,7 +84,7 @@ public class GameInfoControllerTest {
         String json = objectMapper.writeValueAsString(request);
 
         mockMvc.perform(post("/api/v1/gameInfo/save")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .content(json))
                 .andExpect(status().isOk())
                 .andDo(print());
@@ -110,9 +106,12 @@ public class GameInfoControllerTest {
 
         // then
         mockMvc.perform(post("/api/v1/gameInfo/save")
-                        .contentType(MediaType.APPLICATION_JSON)
+                        .contentType(APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().isNotFound())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.message")
+                        .value(makeMessage("GameInfo", DuplicatedCode.getMessage(), "name & date")))
                 .andDo(print());
     }
 
@@ -135,16 +134,24 @@ public class GameInfoControllerTest {
 
         mockMvc.perform(get("/api/v1/gameInfo/{Id}", gameInfo.getId() + 10L))
                 .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value(404))
+                .andExpect(jsonPath("$.message")
+                        .value(makeMessage("GameInfo", NoValueCode.getMessage(), "id")))
                 .andDo(print());
     }
 
     @Test
     @DisplayName("검색 - 경기 이름")
     public void searchByName() throws Exception {
+
+        GameInfoSearchRequest searchRequest = GameInfoSearchRequest.builder()
+                .name("경기 이름")
+                .build();
+
         String json = objectMapper.writeValueAsString(searchRequest);
 
         mockMvc.perform(post("/api/v1/gameInfo/search")
-                        .contentType(MediaType.APPLICATION_JSON)
+                        .contentType(APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value("경기 이름 14"))
@@ -153,5 +160,156 @@ public class GameInfoControllerTest {
                 .andDo(print());
     }
 
+    @Test
+    @DisplayName("검색 - 경기 날짜")
+    public void searchByDate() throws Exception {
+
+        GameInfoSearchRequest searchRequest = GameInfoSearchRequest.builder()
+                .date("12월 11일")
+                .build();
+
+        String json = objectMapper.writeValueAsString(searchRequest);
+
+        mockMvc.perform(post("/api/v1/gameInfo/search")
+                        .contentType(APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name").value("경기 이름 14"))
+                .andExpect(jsonPath("$[0].date").value("12월 11일"))
+                .andExpect(jsonPath("$[0].location").value("경기 위치 14"))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("검색 - 경기 위치")
+    public void searchByLocation() throws Exception {
+
+        GameInfoSearchRequest searchRequest = GameInfoSearchRequest.builder()
+                .location("경기장")
+                .build();
+
+        String json = objectMapper.writeValueAsString(searchRequest);
+
+        mockMvc.perform(post("/api/v1/gameInfo/search")
+                        .contentType(APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name").value("서울 vs 부산"))
+                .andExpect(jsonPath("$[0].date").value("12월 12일"))
+                .andExpect(jsonPath("$[0].location").value("경기장"))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("검색 - 이름, 날짜, 위치  [ 성공 ]")
+    public void searchByRequestSuccess() throws Exception {
+
+        GameInfoSearchRequest searchRequest = GameInfoSearchRequest.builder()
+                .name("서울 vs 부산")
+                .date("12월 12일")
+                .location("경기장")
+                .build();
+
+        String json = objectMapper.writeValueAsString(searchRequest);
+
+        mockMvc.perform(post("/api/v1/gameInfo/search")
+                        .contentType(APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name").value("서울 vs 부산"))
+                .andExpect(jsonPath("$[0].date").value("12월 12일"))
+                .andExpect(jsonPath("$[0].location").value("경기장"))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("검색 - 이름, 날짜, 위치  [ 결과 없음 ]")
+    public void searchByRequestNoValue() throws Exception {
+
+        GameInfoSearchRequest searchRequest = GameInfoSearchRequest.builder()
+                .name("서울 vs 부산")
+                .date("12월 12일")
+                .location("경기장 2")
+                .build();
+
+        String json = objectMapper.writeValueAsString(searchRequest);
+
+        mockMvc.perform(post("/api/v1/gameInfo/search")
+                        .contentType(APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name").doesNotExist())
+                .andExpect(jsonPath("$[0].date").doesNotExist())
+                .andExpect(jsonPath("$[0].location").doesNotExist())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("수정 - 이름만 수정")
+    public void modifyName() throws Exception {
+
+        GameInfoModifyRequest searchRequest = GameInfoModifyRequest.builder()
+                .name("부천 vs 서울")
+                .date("12월 12일")
+                .location("경기장")
+                .build();
+
+        String json = objectMapper.writeValueAsString(searchRequest);
+
+        mockMvc.perform(put("/api/v1/gameInfo/{Id}", gameInfo.getId() )
+                        .contentType(APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("수정 - GameInfo 없어서 예외 발생 ")
+    public void modifyNoValue() throws Exception {
+
+        GameInfoModifyRequest searchRequest = GameInfoModifyRequest.builder()
+                .name("부천 vs 서울")
+                .date("12월 12일")
+                .location("경기장")
+                .build();
+
+        String json = objectMapper.writeValueAsString(searchRequest);
+
+        mockMvc.perform(put("/api/v1/gameInfo/{Id}", gameInfo.getId() + 100L )
+                        .contentType(APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value(404))
+                .andExpect(jsonPath("$.message")
+                        .value(makeMessage("GameInfo", NoValueCode.getMessage(), "id")))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("삭제")
+    public void deleteGameInfo() throws Exception {
+
+        mockMvc.perform(delete("/api/v1/gameInfo/{gameInfoId}", gameInfo.getId())
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("삭제 - GameInfo 없어서 예외발생")
+    public void deleteGameInfoNoValue() throws Exception {
+
+        mockMvc.perform(delete("/api/v1/gameInfo/{gameInfoId}", gameInfo.getId() + 100L)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value(404))
+                .andExpect(jsonPath("$.message")
+                        .value(makeMessage("GameInfo", NoValueCode.getMessage(), "id")))
+                .andDo(print());
+    }
+
+    public String makeMessage(String type, String message, String field) {
+        return ("[" + type + "] " + message + " { 필드 : " + field + " }" );
+    }
 
 }
