@@ -6,7 +6,7 @@ import static com.kleague.kleaguefinder.exception.ErrorCode.*;
 
 public class NoValueException extends MainException {
 
-    private static final String MESSAGE = NoValueCode.getMessage();
+    private static final String MESSAGE = NO_VALUE_CODE.getMessage();
 
     public NoValueException(String type, String field) {
         super(type, MESSAGE, field);

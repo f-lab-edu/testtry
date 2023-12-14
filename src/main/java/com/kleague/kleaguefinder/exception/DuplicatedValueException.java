@@ -4,7 +4,7 @@ import static com.kleague.kleaguefinder.exception.ErrorCode.*;
 
 public class DuplicatedValueException extends MainException {
 
-    private static final String MESSAGE = DuplicatedCode.getMessage();
+    private static final String MESSAGE = DUPLICATED_CODE.getMessage();
 
     public DuplicatedValueException(String type, String field) {
         super(type, MESSAGE, field);

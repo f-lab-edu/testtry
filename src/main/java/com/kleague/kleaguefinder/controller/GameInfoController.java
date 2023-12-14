@@ -8,8 +8,10 @@ import com.kleague.kleaguefinder.service.GameInfoService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -20,8 +22,7 @@ public class GameInfoController {
     private final GameInfoService gameInfoService;
 
     @PostMapping("api/v1/gameInfo/save")
-    public Long save(@RequestBody GameInfoCreateRequest request) {
-        log.info("controller request ={}", request.getDate());
+    public Long save(@Valid @RequestBody GameInfoCreateRequest request) {
         return gameInfoService.save(request);
     }
 
@@ -36,7 +37,7 @@ public class GameInfoController {
     }
 
     @PutMapping("api/v1/gameInfo/{gameInfoId}")
-    public void modify(@PathVariable("gameInfoId") Long id, @RequestBody GameInfoModifyRequest request) {
+    public void modify(@PathVariable("gameInfoId") Long id, @Valid @RequestBody GameInfoModifyRequest request) {
         gameInfoService.modify(id,request);
     }
 

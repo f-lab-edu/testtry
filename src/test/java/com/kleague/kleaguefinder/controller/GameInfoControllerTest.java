@@ -2,6 +2,7 @@ package com.kleague.kleaguefinder.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kleague.kleaguefinder.domain.GameInfo;
+import com.kleague.kleaguefinder.exception.ErrorCode;
 import com.kleague.kleaguefinder.repository.gameinfo.GameInfoRepository;
 import com.kleague.kleaguefinder.request.gameinfo.GameInfoCreateRequest;
 import com.kleague.kleaguefinder.request.gameinfo.GameInfoModifyRequest;
@@ -92,6 +93,53 @@ public class GameInfoControllerTest {
     }
 
     @Test
+    @DisplayName("저장 - Request 필드 누락")
+    public void saveRequestMissingV1() throws Exception {
+        // given
+        GameInfoCreateRequest request = GameInfoCreateRequest.builder()
+                .name("경기이름")
+                .date("날짜")
+                .build();
+
+        // when
+        String json = objectMapper.writeValueAsString(request);
+
+        // then
+        mockMvc.perform(post("/api/v1/gameInfo/save")
+                        .contentType(APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.messages[0]")
+                        .value(makeMessage("gameInfoCreateRequest", AnnotationMsg.NOT_BLANK, "location")))
+                .andDo(print());
+    }
+
+   @Test
+    @DisplayName("저장 - Request 여러개 필드 누락")
+    public void saveRequestMissingV2() throws Exception {
+        // given
+        GameInfoCreateRequest request = GameInfoCreateRequest.builder()
+                .date("날짜")
+                .build();
+
+        // when
+        String json = objectMapper.writeValueAsString(request);
+
+        // then
+        mockMvc.perform(post("/api/v1/gameInfo/save")
+                        .contentType(APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.messages[0]")
+                        .value(makeMessage("gameInfoCreateRequest", AnnotationMsg.NOT_BLANK, "name")))
+                .andExpect(jsonPath("$.messages[1]")
+                        .value(makeMessage("gameInfoCreateRequest", AnnotationMsg.NOT_BLANK, "location")))
+                .andDo(print());
+    }
+
+    @Test
     @DisplayName("GameInfo 저장 실패")
     public void saveFail() throws Exception {
         // given
@@ -110,8 +158,8 @@ public class GameInfoControllerTest {
                         .content(json))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(400))
-                .andExpect(jsonPath("$.message")
-                        .value(makeMessage("GameInfo", DuplicatedCode.getMessage(), "name & date")))
+                .andExpect(jsonPath("$.messages[0]")
+                        .value(makeMessage("GameInfo", DUPLICATED_CODE.getMessage(), "name & date")))
                 .andDo(print());
     }
 
@@ -135,8 +183,8 @@ public class GameInfoControllerTest {
         mockMvc.perform(get("/api/v1/gameInfo/{Id}", gameInfo.getId() + 10L))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value(404))
-                .andExpect(jsonPath("$.message")
-                        .value(makeMessage("GameInfo", NoValueCode.getMessage(), "id")))
+                .andExpect(jsonPath("$.messages[0]")
+                        .value(makeMessage("GameInfo", NO_VALUE_CODE.getMessage(), "id")))
                 .andDo(print());
     }
 
@@ -263,6 +311,31 @@ public class GameInfoControllerTest {
                 .andDo(print());
     }
 
+
+    @Test
+    @DisplayName("저장 - Request 필드 누락")
+    public void modifyRequestMissingV1() throws Exception {
+        // given
+        GameInfoModifyRequest request = GameInfoModifyRequest.builder()
+                .name("경기 내용")
+                .location("경기 위치")
+                .build();
+
+        // when
+        String json = objectMapper.writeValueAsString(request);
+
+        // then
+        mockMvc.perform(put("/api/v1/gameInfo/{gameInfoId}", gameInfo.getId())
+                        .contentType(APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.messages[0]")
+                        .value(makeMessage("gameInfoModifyRequest", AnnotationMsg.NOT_BLANK, "date")))
+                .andDo(print());
+    }
+
+
     @Test
     @DisplayName("수정 - GameInfo 없어서 예외 발생 ")
     public void modifyNoValue() throws Exception {
@@ -280,8 +353,8 @@ public class GameInfoControllerTest {
                         .content(json))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value(404))
-                .andExpect(jsonPath("$.message")
-                        .value(makeMessage("GameInfo", NoValueCode.getMessage(), "id")))
+                .andExpect(jsonPath("$.messages[0]")
+                        .value(makeMessage("GameInfo", NO_VALUE_CODE.getMessage(), "id")))
                 .andDo(print());
     }
 
@@ -303,10 +376,12 @@ public class GameInfoControllerTest {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value(404))
-                .andExpect(jsonPath("$.message")
-                        .value(makeMessage("GameInfo", NoValueCode.getMessage(), "id")))
+                .andExpect(jsonPath("$.messages[0]")
+                        .value(makeMessage("GameInfo", NO_VALUE_CODE.getMessage(), "id")))
                 .andDo(print());
     }
+
+
 
     public String makeMessage(String type, String message, String field) {
         return ("[" + type + "] " + message + " { 필드 : " + field + " }" );
