@@ -17,13 +17,13 @@ public class Seat {
     @Column(name = "seat_id")
     private Long id;
 
-    private String name;
+    private String seatNumber;
 
     private Category category;
 
     @Builder
-    public Seat(String name, Category category) {
-        this.name = name;
+    public Seat(String seatNumber, Category category) {
+        this.seatNumber = seatNumber;
         this.category = category;
     }
 }
