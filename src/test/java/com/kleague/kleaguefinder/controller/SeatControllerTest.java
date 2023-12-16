@@ -7,6 +7,8 @@ import com.kleague.kleaguefinder.domain.Seat;
 import com.kleague.kleaguefinder.exception.ErrorCode;
 import com.kleague.kleaguefinder.repository.seat.SeatRepository;
 import com.kleague.kleaguefinder.request.seat.SeatCreateRequest;
+import com.kleague.kleaguefinder.request.seat.SeatModifyRequest;
+import com.kleague.kleaguefinder.request.seat.SeatSearchRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,8 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import static com.kleague.kleaguefinder.domain.Category.*;
 import static com.kleague.kleaguefinder.exception.ErrorCode.*;
 import static org.springframework.http.MediaType.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -94,7 +95,7 @@ public class SeatControllerTest {
 
     @Test
     @DisplayName("저장 실패 - 중복 Seat 존재")
-    public void saveFail() throws Exception {
+    public void saveFailV1() throws Exception {
 
         SeatCreateRequest request = SeatCreateRequest.builder()
                 .seatNumber("1")
@@ -112,6 +113,44 @@ public class SeatControllerTest {
                 .andExpect(jsonPath("$.code").value(400))
                 .andExpect(jsonPath("$.messages[0]")
                         .value(makeMessage("Seat", DUPLICATED_CODE.getMessage(), "seatNumber & category")))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("저장 실패 - request 필드 값 누락")
+    public void saveFailV2() throws Exception {
+        SeatCreateRequest request = SeatCreateRequest.builder()
+                .seatNumber("2")
+                .build();
+
+        String json = objectMapper.writeValueAsString(request);
+
+        mockMvc.perform(post("/api/v1/seat/save")
+                        .contentType(APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.messages[0]")
+                        .value(makeMessage("seatCreateRequest", NOT_NULL_CODE.getMessage(), "category")))
+                .andDo(print());
+    }
+    @Test
+    @DisplayName("저장 실패 - request 필드 값 누락")
+    public void saveFailV3() throws Exception {
+        SeatCreateRequest request = SeatCreateRequest.builder()
+                .build();
+
+        String json = objectMapper.writeValueAsString(request);
+
+        mockMvc.perform(post("/api/v1/seat/save")
+                        .contentType(APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.messages[0]")
+                        .value(makeMessage("seatCreateRequest", NOT_BLANK_CODE.getMessage(), "seatNumber")))
+                .andExpect(jsonPath("$.messages[1]")
+                        .value(makeMessage("seatCreateRequest", NOT_NULL_CODE.getMessage(), "category")))
                 .andDo(print());
     }
 
@@ -139,6 +178,173 @@ public class SeatControllerTest {
                         .value(makeMessage("Seat", NO_VALUE_CODE.getMessage(), "id")))
                 .andDo(print());
     }
+
+    @Test
+    @DisplayName("SearchRequest 로 Seat 검색 - 값 존재")
+    public void findByRequestV1() throws Exception {
+        // given
+        SeatSearchRequest request = SeatSearchRequest.builder()
+                .seatNumber("1")
+                .category(B)
+                .build();
+
+        String json = objectMapper.writeValueAsString(request);
+
+        mockMvc.perform(post("/api/v1/seat/search")
+                        .contentType(APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].seatNumber").value("1"))
+                .andExpect(jsonPath("$[0].category").value("B"))
+                .andDo(print());
+
+    }
+
+    @Test
+    @DisplayName("SearchRequest 로 Seat 검색 -  값 없음 ")
+    public void findByRequestV2() throws Exception {
+        // given
+        SeatSearchRequest request = SeatSearchRequest.builder()
+                .category(A)
+                .build();
+
+        String json = objectMapper.writeValueAsString(request);
+
+        mockMvc.perform(post("/api/v1/seat/search")
+                        .contentType(APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].seatNumber").doesNotExist())
+                .andExpect(jsonPath("$[0].category").doesNotExist())
+                .andDo(print());
+
+    }
+
+    @Test
+    @DisplayName("SearchRequest 로 Seat 검색 - Request 필드 값 누락")
+    public void findByRequestFailV1() throws Exception {
+        // given
+        SeatSearchRequest request = SeatSearchRequest.builder()
+                .seatNumber("1")
+                .build();
+
+        String json = objectMapper.writeValueAsString(request);
+
+        mockMvc.perform(post("/api/v1/seat/search")
+                        .contentType(APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.messages[0]")
+                        .value(makeMessage("seatSearchRequest", NOT_NULL_CODE.getMessage(), "category")))
+                .andDo(print());
+
+    }
+
+    @Test
+    @DisplayName("Seat 수정 - 성공")
+    public void modifySeatSuccess() throws Exception {
+        SeatModifyRequest request = SeatModifyRequest.builder()
+                .seatNumber("1")
+                .category(A)
+                .build();
+
+        String json = objectMapper.writeValueAsString(request);
+
+        mockMvc.perform(put("/api/v1/seat/{seatId}", seatNo1.getId())
+                        .contentType(APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("Seat 수정 - 실패")
+    public void modifySeatFailV1() throws Exception {
+        SeatModifyRequest request = SeatModifyRequest.builder()
+                .seatNumber("1")
+                .category(A)
+                .build();
+
+        String json = objectMapper.writeValueAsString(request);
+
+        mockMvc.perform(put("/api/v1/seat/{seatId}", seatNo1.getId() + 20L)
+                        .contentType(APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value(404))
+                .andExpect(jsonPath("$.messages[0]")
+                        .value(makeMessage("Seat", NO_VALUE_CODE.getMessage(), "id")))
+                .andDo(print());
+
+    }
+
+    @Test
+    @DisplayName("Seat 수정 - request 필드 값 1개 누락")
+    public void modifySeatFailV2() throws Exception {
+        SeatModifyRequest request = SeatModifyRequest.builder()
+                .category(A)
+                .build();
+
+        String json = objectMapper.writeValueAsString(request);
+
+        mockMvc.perform(put("/api/v1/seat/{seatId}", seatNo1.getId())
+                        .contentType(APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.messages[0]")
+                        .value(makeMessage("seatModifyRequest"
+                                , NOT_BLANK_CODE.getMessage(), "seatNumber")))
+                .andDo(print());
+
+    }
+
+    @Test
+    @DisplayName("Seat 수정 - request 필드 값 2개 누락")
+    public void modifySeatFailV3() throws Exception {
+        SeatModifyRequest request = SeatModifyRequest.builder()
+                .build();
+
+        String json = objectMapper.writeValueAsString(request);
+
+        mockMvc.perform(put("/api/v1/seat/{seatId}", seatNo1.getId())
+                        .contentType(APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.messages[0]")
+                        .value(makeMessage("seatModifyRequest"
+                                , NOT_BLANK_CODE.getMessage(), "seatNumber")))
+                .andExpect(jsonPath("$.messages[1]")
+                        .value(makeMessage("seatModifyRequest"
+                                ,NOT_NULL_CODE.getMessage(), "category")))
+                .andDo(print());
+
+    }
+
+
+    @Test
+    @DisplayName("Seat 삭제 - 성공")
+    public void deleteSuccess() throws Exception {
+
+        mockMvc.perform(delete("/api/v1/seat/{seatId}", seatNo1.getId()))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("Seat 삭제 - 실패")
+    public void deleteFail() throws Exception {
+
+        mockMvc.perform(delete("/api/v1/seat/{seatId}", seatNo1.getId()+100L))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value(404))
+                .andExpect(jsonPath("$.messages[0]")
+                        .value(makeMessage("Seat", NO_VALUE_CODE.getMessage(), "id")))
+                .andDo(print());
+    }
+
 
     public String makeMessage(String type, String message, String field) {
         return ("[" + type + "] " + message + " { 필드 : " + field + " }" );

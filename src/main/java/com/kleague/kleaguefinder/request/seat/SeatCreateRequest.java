@@ -6,14 +6,18 @@ import lombok.Builder;
 import lombok.Getter;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
+import static com.kleague.kleaguefinder.exception.ErrorCode.AnnotationMsg.NOT_BLANK;
+import static com.kleague.kleaguefinder.exception.ErrorCode.AnnotationMsg.NOT_NULL;
 
 @Getter
 public class SeatCreateRequest {
 
-    @NotBlank
+    @NotBlank(message = NOT_BLANK)
     private String seatNumber;
 
-    @NotBlank
+    @NotNull(message = NOT_NULL)
     private Category category;
 
     @Builder

@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
-import static com.kleague.kleaguefinder.domain.QGameInfo.gameInfo;
+
 import static com.kleague.kleaguefinder.domain.QSeat.*;
 
 @RequiredArgsConstructor
@@ -20,7 +20,10 @@ public class SeatCustomRepositoryImpl implements SeatCustomRepository {
 
     @Override
     public List<Seat> findBySearchRequest(SeatSearchRequest request) {
-        return null;
+        return jpaQueryFactory.selectFrom(seat)
+                .where(seat.seatNumber.contains(request.getSeatNumber())
+                        .and(seat.category.eq(request.getCategory())))
+                .fetch();
     }
 
     @Override

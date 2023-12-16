@@ -3,11 +3,14 @@ package com.kleague.kleaguefinder.request.seat;
 import com.kleague.kleaguefinder.domain.Category;
 import com.kleague.kleaguefinder.domain.GameInfo;
 import com.kleague.kleaguefinder.domain.Seat;
+import com.kleague.kleaguefinder.exception.ErrorCode;
 import lombok.Builder;
 import lombok.Getter;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
+import static com.kleague.kleaguefinder.exception.ErrorCode.AnnotationMsg.*;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
@@ -20,7 +23,7 @@ public class SeatSearchRequest {
     @Builder.Default
     private String seatNumber = "";
 
-    @NotBlank
+    @NotNull(message = NOT_NULL)
     private Category category ;
 
     @Builder.Default

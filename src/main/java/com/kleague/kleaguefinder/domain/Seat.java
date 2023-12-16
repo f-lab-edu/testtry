@@ -26,4 +26,9 @@ public class Seat {
         this.seatNumber = seatNumber;
         this.category = category;
     }
+
+    public void modify(String seatNumber, Category category) {
+        this.seatNumber = seatNumber;
+        this.category = category;
+    }
 }
