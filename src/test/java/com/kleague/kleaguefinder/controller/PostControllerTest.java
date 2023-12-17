@@ -1,7 +1,9 @@
 package com.kleague.kleaguefinder.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kleague.kleaguefinder.domain.Post;
+import com.kleague.kleaguefinder.exception.ErrorCode;
 import com.kleague.kleaguefinder.repository.PostRepository;
 import com.kleague.kleaguefinder.request.PostCreateRequest;
 import com.kleague.kleaguefinder.request.PostModifyRequest;
@@ -18,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.kleague.kleaguefinder.exception.ErrorCode.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -52,6 +55,26 @@ class PostControllerTest {
     }
 
     @Test
+    @DisplayName("글 작성 실패 - Request 값 누락")
+    public void writePostFail() throws Exception {
+        //given
+        PostCreateRequest request = PostCreateRequest.builder()
+                .title("제목")
+                .build();
+
+        //when
+        String json = objectMapper.writeValueAsString(request);
+        //then
+        mockMvc.perform(post("/v1/posts/write")
+                        .contentType(MediaType.APPLICATION_JSON).content(json))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.messages[0]")
+                        .value(makeMessage("postCreateRequest", NOT_BLANK_CODE.getMessage(), "content" )))
+                .andDo(print());
+    }
+
+    @Test
     @DisplayName("글 단건 검색 - 성공")
     public void searchPostSuccess() throws Exception {
         //given
@@ -79,10 +102,12 @@ class PostControllerTest {
                 .title("제목")
                 .content("내용")
                 .build();
+
+        postRepository.save(post);
         //when
         String json = objectMapper.writeValueAsString(post);
         //then
-        mockMvc.perform(get("/v1/posts/{postId}", post.getId()))
+        mockMvc.perform(get("/v1/posts/{postId}", post.getId() + 1L))
                 .andExpect(status().isNotFound())
                 .andDo(print());
     }
@@ -364,6 +389,7 @@ class PostControllerTest {
 
     }
 
+
     @Test
     @DisplayName("글 제목 , 내용 수정")
     public void modifyPost() throws Exception {
@@ -374,16 +400,75 @@ class PostControllerTest {
 
         postRepository.save(post);
 
-        PostModifyRequest postModify = new PostModifyRequest();
-        postModify.setTitle("수정된 제목입니다.");
-        postModify.setContent("수정된 내용입니다.");
+        PostModifyRequest request = PostModifyRequest.builder()
+                .title("수정된 제목입니다.")
+                .content("수정된 내용입니다.")
+                .build();
 
-        String json = objectMapper.writeValueAsString(postModify);
+        String json = objectMapper.writeValueAsString(request);
 
         mockMvc.perform(put("/v1/posts/{postId}", post.getId())
                         .content(json)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
+                .andDo(print());
+
+    }
+
+    @Test
+    @DisplayName("Post Request 로 수정 - Request 필드 1개 누락")
+    public void searchPostByRequestFailV1() throws Exception {
+        Post post = Post.builder()
+                .title("제목")
+                .content("내용")
+                .build();
+
+        postRepository.save(post);
+
+        PostModifyRequest request = PostModifyRequest.builder()
+                .title("제목")
+                .build();
+
+        String json = objectMapper.writeValueAsString(request);
+
+        mockMvc.perform(put("/v1/posts/{postId}", post.getId())
+                        .content(json)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.messages[0]")
+                        .value(makeMessage("postModifyRequest"
+                                , NOT_BLANK_CODE.getMessage(), "content")))
+                .andDo(print());
+
+    }
+
+    @Test
+    @DisplayName("Post Request 로 수정 - Request 필드 2개 누락")
+    public void searchPostByRequestFailV2() throws Exception {
+        Post post = Post.builder()
+                .title("제목")
+                .content("내용")
+                .build();
+
+        postRepository.save(post);
+
+        PostModifyRequest request = PostModifyRequest.builder()
+                .build();
+
+        String json = objectMapper.writeValueAsString(request);
+
+        mockMvc.perform(put("/v1/posts/{postId}", post.getId())
+                        .content(json)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.messages[0]")
+                        .value(makeMessage("postModifyRequest"
+                                , NOT_BLANK_CODE.getMessage(), "title")))
+                .andExpect(jsonPath("$.messages[1]")
+                        .value(makeMessage("postModifyRequest", NOT_BLANK_CODE.getMessage()
+                                ,"content" )))
                 .andDo(print());
 
     }
@@ -432,6 +517,9 @@ class PostControllerTest {
                 .andDo(print());
     }
 
+    public String makeMessage(String type, String message, String field) {
+        return ("[" + type + "] " + message + " { 필드 : " + field + " }" );
+    }
 
 
 

@@ -1,28 +1,22 @@
 package com.kleague.kleaguefinder.exception;
 
-import com.kleague.kleaguefinder.response.exception.ValidationTuple;
 import lombok.Getter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 public abstract class MainException extends RuntimeException{
 
-    List<ValidationTuple> validationTupleList = new ArrayList<>();
-
-    public MainException(String message) {
-        super(message);
+    public MainException(String type, String message, String field) {
+        super(makeMessage(type, message, field));
     }
 
-    public MainException(String message, Throwable cause) {
-        super(message, cause);
+    public MainException(String type, String message, String field, Throwable cause) {
+        super(makeMessage(type, message, field), cause);
     }
 
-    public abstract int statusCode();
+    public abstract int getStatusCode();
 
-    public void addValidationFields(Long id,String entityName){
-        validationTupleList.add(new ValidationTuple(id, entityName));
-    };
+    private static String makeMessage(String type, String message, String field) {
+        return ("[" + type + "] " + message + " { 필드 : " + field + " }" );
+    }
 
 }
