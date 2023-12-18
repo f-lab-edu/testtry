@@ -5,6 +5,7 @@ import lombok.Getter;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+
 @Getter
 public abstract class MainException extends RuntimeException{
 
@@ -21,5 +22,4 @@ public abstract class MainException extends RuntimeException{
     private static String makeMessage(String type, String message, String field) {
         return ("[" + type + "] " + message + " { 필드 : " + field + " }" );
     }
-
 }
