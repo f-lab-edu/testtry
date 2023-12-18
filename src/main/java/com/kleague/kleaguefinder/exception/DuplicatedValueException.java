@@ -1,6 +1,6 @@
 package com.kleague.kleaguefinder.exception;
 
-import static com.kleague.kleaguefinder.exception.ErrorCode.DUPLICATED_CODE;
+import static com.kleague.kleaguefinder.exception.ErrorCode.*;
 
 public class DuplicatedValueException extends MainException {
 

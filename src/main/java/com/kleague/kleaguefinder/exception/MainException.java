@@ -18,5 +18,4 @@ public abstract class MainException extends RuntimeException{
     private static String makeMessage(String type, String message, String field) {
         return ("[" + type + "] " + message + " { 필드 : " + field + " }" );
     }
-
 }

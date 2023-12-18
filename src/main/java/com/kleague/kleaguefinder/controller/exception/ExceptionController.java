@@ -1,7 +1,7 @@
 package com.kleague.kleaguefinder.controller.exception;
 
 import com.kleague.kleaguefinder.exception.MainException;
-import com.kleague.kleaguefinder.response.exception.ErrorResponse;
+import com.kleague.kleaguefinder.response.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -28,6 +28,7 @@ public class ExceptionController {
         errorResponse.addMessages(e.getMessage());
 
         return ResponseEntity.status(e.getStatusCode()).body(errorResponse);
+
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -54,5 +55,4 @@ public class ExceptionController {
 
         return messages;
     }
-
 }

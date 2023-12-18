@@ -1,6 +1,9 @@
 package com.kleague.kleaguefinder.exception;
 
-import static com.kleague.kleaguefinder.exception.ErrorCode.NO_VALUE_CODE;
+import com.kleague.kleaguefinder.exception.MainException;
+
+import static com.kleague.kleaguefinder.exception.ErrorCode.*;
+
 
 public class NoValueException extends MainException {
 
