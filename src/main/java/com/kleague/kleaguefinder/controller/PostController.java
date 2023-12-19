@@ -5,42 +5,47 @@ import com.kleague.kleaguefinder.request.post.PostModifyRequest;
 import com.kleague.kleaguefinder.request.post.PostSearchRequest;
 import com.kleague.kleaguefinder.response.PostResponse;
 import com.kleague.kleaguefinder.service.PostService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
 @Slf4j
 public class PostController {
 
-    private final PostService postService;
+  private final PostService postService;
 
-    @PostMapping("api/v1/posts/write")
-    public Long write(@RequestBody PostCreateRequest postCreateRequest) {
-        return postService.write(postCreateRequest);
-    }
+  @PostMapping("api/v1/posts/write")
+  public Long write(@RequestBody PostCreateRequest postCreateRequest) {
+    return postService.write(postCreateRequest);
+  }
 
-    @GetMapping("api/v1/posts/{id}")
-    public PostResponse findOne(@PathVariable("id") Long id) {
-        return postService.findOne(id);
-    }
+  @GetMapping("api/v1/posts/{id}")
+  public PostResponse findOne(@PathVariable("id") Long id) {
+    return postService.findOne(id);
+  }
 
-    @PostMapping("api/v1/posts/search")
-    public List<PostResponse> search(@RequestBody PostSearchRequest postSearchRequest) {
-        return postService.findBySearch(postSearchRequest);
-    }
+  @PostMapping("api/v1/posts/search")
+  public List<PostResponse> search(@RequestBody PostSearchRequest postSearchRequest) {
+    return postService.findBySearch(postSearchRequest);
+  }
 
-    @PutMapping("api/v1/posts/{id}")
-    public void modify(@PathVariable("id") Long id,
-                       @RequestBody PostModifyRequest postModifyRequest) {
-        postService.modify(id, postModifyRequest);
-    }
+  @PutMapping("api/v1/posts/{id}")
+  public void modify(@PathVariable("id") Long id,
+      @RequestBody PostModifyRequest postModifyRequest) {
+    postService.modify(id, postModifyRequest);
+  }
 
-    @DeleteMapping("api/v1/posts/{id}")
-    public void delete(@PathVariable("id") Long id) {
-        postService.delete(id);
-    }
+  @DeleteMapping("api/v1/posts/{id}")
+  public void delete(@PathVariable("id") Long id) {
+    postService.delete(id);
+  }
 }

@@ -7,19 +7,19 @@ import lombok.Data;
 @Data
 public class PostResponse {
 
-    private String title;
-    private String content;
+  private String title;
+  private String content;
 
-    @Builder
-    public PostResponse(String title, String content) {
-        this.title = title;
-        this.content = content;
-    }
+  @Builder
+  public PostResponse(String title, String content) {
+    this.title = title;
+    this.content = content;
+  }
 
-    public static PostResponse createPostResponse(Post post) {
-       return PostResponse.builder()
-                .title(post.getTitle())
-                .content(post.getContent())
-                .build();
-    }
+  public static PostResponse createPostResponse(Post post) {
+    return PostResponse.builder()
+        .title(post.getTitle())
+        .content(post.getContent())
+        .build();
+  }
 }
