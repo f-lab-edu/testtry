@@ -2,24 +2,21 @@ package com.kleague.kleaguefinder.exception;
 
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 
 @Getter
-public abstract class MainException extends RuntimeException{
+public abstract class MainException extends RuntimeException {
 
-    public MainException(String type, String message, String field) {
-        super(makeMessage(type, message, field));
-    }
+  public MainException(String type, String message, String field) {
+    super(makeMessage(type, message, field));
+  }
 
-    public MainException(String type, String message, String field, Throwable cause) {
-        super(makeMessage(type, message, field), cause);
-    }
+  public MainException(String type, String message, String field, Throwable cause) {
+    super(makeMessage(type, message, field), cause);
+  }
 
-    public abstract int getStatusCode();
+  public abstract int getStatusCode();
 
-    private static String makeMessage(String type, String message, String field) {
-        return ("[" + type + "] " + message + " { 필드 : " + field + " }" );
-    }
+  private static String makeMessage(String type, String message, String field) {
+    return ("[" + type + "] " + message + " { 필드 : " + field + " }");
+  }
 }
